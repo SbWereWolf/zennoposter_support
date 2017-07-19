@@ -108,12 +108,12 @@ SELECT
   a.id    AS id
 FROM
   account a
-WHERE
-  EXISTS(
+WHERE 
+  a.is_hidden = FALSE
+  AND EXISTS(
     SELECT NULL FROM tag t JOIN tag_account ta ON t.id = ta.tag_id WHERE ta.account_id = a.id AND t.code = 'RELIABLE'
   )
-AND
-  EXISTS(
+  AND EXISTS(
     SELECT NULL FROM tag t JOIN tag_account ta ON t.id = ta.tag_id WHERE ta.account_id = a.id AND t.code = 'PROMO_ME'
   )
 ;
@@ -127,7 +127,7 @@ $accountCount = count($accountCollection);
 $getPost = "
 SELECT
   p.id as post_id,
-  p.title as post_title,
+  btrim(p.title) as post_title,
   p.body as post_body,
   p.bulk_tags as post_tags
 FROM
@@ -137,6 +137,7 @@ FROM
 WHERE
   p.is_hidden IS TRUE
   AND ap.id IS NULL
+  ORDER BY p.insert_date
   LIMIT $accountCount;
 ";
 
